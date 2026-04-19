@@ -1,0 +1,29 @@
+﻿@inherits LayoutComponentBase
+
+<div style="display: flex; height: 100vh;">
+    <div style="width: 220px; background: #1c1c1e; color: white; display: flex; flex-direction: column;">
+        <div style="padding: 25px 20px; background: #000;">
+            <b style="font-size: 18px;">LW MOTOR</b>
+        </div>
+        
+        <nav style="flex: 1; padding: 20px 10px;">
+            <NavLink href="" Match="NavLinkMatch.All" style="display: block; padding: 15px; color: #fff; text-decoration: none; border-radius: 10px; margin-bottom: 10px;" active-class="nav-active">
+                📄 New Invoice
+            </NavLink>
+            <NavLink href="storage" style="display: block; padding: 15px; color: #fff; text-decoration: none; border-radius: 10px;" active-class="nav-active">
+                📦 Parts List
+            </NavLink>
+        </nav>
+    </div>
+
+    <div style="flex: 1; overflow-y: auto; background: #f2f2f7;">
+        @Body
+    </div>
+</div>
+
+<style>
+    .nav-active {
+        background: #007aff !important;
+        font-weight: bold;
+    }
+</style>

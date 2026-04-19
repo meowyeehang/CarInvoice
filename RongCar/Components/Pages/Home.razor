@@ -1,0 +1,452 @@
+﻿@using RongCar
+@page "/"
+@inject RongCar.Data.StorageService StorageService
+@if (!showPreview)
+{
+    <div style="padding: 30px; background: #f0f2f5; min-height: 100vh; font-family: 'Segoe UI', Roboto, sans-serif;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h2 style="margin: 0; color: #1a73e8; font-weight: 800; letter-spacing: 1px;">RONG MOTOR <span style="color: #5f6368; font-weight: 400;">| ENTRY CARD</span></h2>
+           <input @bind="invoiceDate" 
+       style="background: #e8f0fe; 
+              color: #1967d2; 
+              padding: 8px 15px; 
+              border-radius: 20px; 
+              font-weight: bold; 
+              font-size: 14px; 
+              border: none; 
+              width: 180px; 
+              text-align: center; 
+              cursor: pointer;" 
+       placeholder="Enter Date..." />
+        </div>
+
+        <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px;">
+            <p style="margin-top: 0; margin-bottom: 15px; font-weight: bold; color: #5f6368; text-transform: uppercase; font-size: 11px;">Vehicle & Payment Info</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                <div>
+                    <label style="font-size: 12px; color: #70757a; font-weight: 600;">INVOICE NO</label>
+                    <input @bind="invoiceNo" style="width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; font-weight: bold;" />
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: #70757a; font-weight: 600;">PLATE NO</label>
+                    <input @bind="plateNo" placeholder="Vxx 1234" style="width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; font-weight: bold; text-transform: uppercase;" />
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: #d93025; font-weight: 800;">DEPOSIT (RM)</label>
+                    <input type="number" @bind="deposit" style="width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #d93025; border-radius: 8px; font-size: 16px; font-weight: bold; color: #d93025;" />
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: #70757a; font-weight: 600;">CAR BRAND</label>
+                    <select @bind="selectedCar" style="width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; background: white; font-weight: bold;">
+                        <option value="">-- Select --</option>
+                        @foreach (var brand in carBrands) { <option value="@brand">@brand</option> }
+                    </select>
+                </div>
+                <div style="grid-column: span 2;">
+                    <label style="font-size: 12px; color: #70757a; font-weight: 600;">CAR MODEL / REMARKS</label>
+                    <input @bind="specificModel" placeholder="e.g. CIVIC FL1" style="width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;" />
+                </div>
+            </div>
+        </div>
+
+        <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <p style="margin-top: 0; margin-bottom: 15px; font-weight: bold; color: #5f6368; text-transform: uppercase; font-size: 11px;">Service Particulars</p>
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0 10px;">
+                <thead>
+                    <tr style="color: #70757a; font-size: 12px;">
+                        <th style="text-align: left; padding: 0 10px;">DESCRIPTION</th>
+                        <th style="width: 80px; text-align: center;">QTY</th>
+                        <th style="width: 140px; text-align: center;">UNIT PRICE</th>
+                        <th style="width: 50px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+    @foreach (var item in Items)
+    {
+        <tr>
+            <td style="padding: 5px 10px;">
+                <input @bind="item.Description" 
+                       list="parts-list" 
+                       style="width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; font-size: 14px;" 
+                       placeholder="Search part..." />
+            </td>
+
+            <td style="width: 80px;">
+                <input type="number" @bind="item.Qty" 
+                       style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; text-align: center;" />
+            </td>
+
+            <td style="width: 150px;">
+                <div style="position: relative; display: flex; align-items: center;">
+                    <span style="position: absolute; left: 10px; color: #70757a; font-size: 12px;">RM</span>
+                    <input type="number" @bind="item.Price" 
+                           style="width: 100%; padding: 12px 12px 12px 35px; border: 1px solid #e0e0e0; border-radius: 8px;" />
+                </div>
+            </td>
+
+            <td style="text-align: right; width: 50px;">
+                <button @onclick="() => Items.Remove(item)" 
+                        style="background: #feeef0; color: #d93025; border: none; width: 40px; height: 40px; border-radius: 8px; cursor: pointer;">
+                    ✕
+                </button>
+            </td>
+        </tr>
+    }
+</tbody>
+
+<datalist id="parts-list">
+    @foreach (var stock in StorageService.Inventory)
+    {
+        <option value="@stock.Name">Stock: @stock.Quantity</option>
+    }
+</datalist>
+            </table>
+<button @onclick="AddItem" 
+        disabled="@(Items.Count >= 20)"
+        style="background: @(Items.Count >= 20 ? "#cccccc" : "#e8f0fe"); 
+               color: @(Items.Count >= 20 ? "#666666" : "#1a73e8"); 
+               padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+    + Add New Item @(Items.Count >= 20 ? "(Max 20 reached)" : "")
+</button>        </div>
+
+        <div style="margin-top: 30px; display: flex; justify-content: flex-end; gap: 15px;">
+            <button @onclick="ClearForm" style="padding: 15px 25px; background: white; color: #5f6368; border: 2px solid #e0e0e0; border-radius: 12px; font-weight: bold;">Clear Form</button>
+            <button @onclick="TogglePreview" style="padding: 15px 45px; background: #1a73e8; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 10px rgba(26, 115, 232, 0.3);">Preview Invoice →</button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="no-print" style="padding: 12px 25px; background: #202124; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;">
+        <button @onclick="TogglePreview" style="background: transparent; color: #e8eaed; padding: 10px 18px; border: 1px solid #5f6368; border-radius: 8px; font-weight: 600;">← BACK TO EDIT</button>
+        <button @onclick="DirectAndroidPrint" style="background: #1a73e8; color: white; padding: 10px 25px; border: none; border-radius: 8px; font-weight: bold;">⎙ PRINT / SAVE PDF</button>                       
+    </div>
+
+    @* Use display: flex and flex-direction: column to manage the vertical space *@
+    <div class="page" style="width: 210mm; height: 297mm; padding: 12mm; margin: 10mm auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; box-sizing: border-box; color: black; position: relative;">        
+        
+        @* 1. Header Section *@
+        <div style="flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px;">
+            <div style="margin: 0; padding: 24px; position: relative; width: fit-content; min-width: 65%;
+             background: 
+                linear-gradient(to right, #000 3.5px, transparent 3.5px) 0 0,
+                linear-gradient(to bottom, #000 3.5px, transparent 3.5px) 0 0,
+                linear-gradient(to left, #000 3.5px, transparent 3.5px) 100% 100%,
+                linear-gradient(to top, #000 3.5px, transparent 3.5px) 100% 100%;
+             background-repeat: no-repeat;
+             background-size: 150px 60px, 150px 60px, 450px 60px, 450px 60px; 
+             line-height: 1.4;">
+                <h1 style="margin: 0; font-size: 18px; font-weight: 800; white-space: nowrap;">RONG MOTOR CAR SERVICE</h1>
+                <p style="margin: 3px 0; font-size: 13px; font-weight: bold;">(002907945-T)</p>
+                <p style="margin: 3px 0; font-size: 13px;">35G, Jalan Seksyen 3/8, Taman Kajang Utama,</p>
+                <p style="margin: 3px 0; font-size: 13px;">43000 Kajang, Selangor Darul Ehsan.</p>
+                <p style="margin: 3px 0; font-size: 13px;">Tel : 012-836 7568</p>
+            </div>
+
+            <div style="text-align: right;">
+                <div style="font-size: 16px; display: block; margin-bottom: -5px;">發貨單</div>
+                <div style="text-decoration: underline; font-size: 16px; letter-spacing: 1px;">Invoice</div>
+                <div style="font-size: 16px; margin-top: 5px;">
+                    No <span style="color: #d93025;">@invoiceNo</span>
+                </div>
+            </div>
+        </div>
+
+        @* 2. Date/Car Info Section *@
+        <div style="flex-shrink: 0; margin-bottom: 12px;">
+            <div style="display:flex; align-items: flex-end;"><div style="width: 80px;font-size: 13px;">Date</div><b>:</b><div style="font-size: 13px;flex:1; margin-left: 10px;">@invoiceDate</div></div>
+            <div style="display:flex; align-items: flex-end;"><div style="width: 80px;font-size: 13px;">Car</div><b>:</b><div style="font-size: 13px;flex:1; margin-left: 10px;">@selectedCar @specificModel</div></div>
+            <div style="display:flex; align-items: flex-end;"><div style="width: 80px;font-size: 13px;">Plate No</div><b>:</b><div style="font-size: 13px;flex:1; margin-left: 10px;">@plateNo</div></div>
+        </div>
+
+        @* 3. Table Area - 'flex-grow: 1' pushes the footer down *@
+        <div style="flex-grow: 1;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-top: 1px solid #000; border-bottom: 1px solid #000;">
+                        <th style="padding: 10px 5px; width: 30px; text-align: center; font-size: 12px; font-weight: normal;">No.</th>
+                        <th style="text-align: left; padding-left: 10px; font-size: 12px; font-weight: normal;">PARTICULARS</th>
+                        <th style="padding: 10px 5px; width: 40px; text-align: center; font-size: 12px; font-weight: normal;">Qty</th>
+                        <th style="width: 80px; text-align: right; font-size: 12px; font-weight: normal;">U.Price</th>
+                        <th style="width: 100px; text-align: right; font-size: 12px; font-weight: normal;">Total (RM)</th>
+                    </tr>
+                </thead>
+                <tbody>
+    @{ int i = 1; }
+    @* 1. Your actual items *@
+    @foreach (var item in Items)
+    {
+        <tr style="height: 30px;">
+            <td style="text-align: center; font-size: 11px;">@(i++)</td>
+            <td style="padding: 0 10px; font-size: 11px;">@item.Description</td>
+            <td style="text-align: center; font-size: 11px;">@item.Qty</td>
+            <td style="text-align: right; font-size: 11px;">@item.Price.ToString("N2")</td>
+            <td style="text-align: right; font-size: 11px;">@((item.Qty * item.Price).ToString("N2"))</td>
+        </tr>
+    }
+
+    @* 2. The "Ghost" rows to fill the gap *@
+    @for (int emptyIdx = Items.Count; emptyIdx < 15; emptyIdx++)
+    {
+        <tr style="height: 30px;">
+            <td style="text-align: center; font-size: 11px; color: #eee;">@i++</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    }
+</tbody>
+            </table>
+        </div>
+
+        @* 4. Footer Section - flex-shrink ensures it stays at the bottom *@
+        <div style="flex-shrink: 0; margin-top: auto; padding-bottom: 5mm;">
+            <div style="display: flex; font-size: 12px; text-transform: uppercase; margin-bottom: 5px;">
+                <span style="margin-right: 10px; font-weight: bold;">RINGGIT MALAYSIA :</span>
+                <div style="flex: 1; border-bottom: 1px solid #eee;">@NumberToWords((int)GrandTotal) ONLY</div>
+            </div>
+
+            <div style="border-top: 2px solid #000; width: 100%; margin-bottom: 12px;"></div>
+                
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div style="font-size: 11px;">
+                    <p style="margin: 0 0 3px 0;"><b>貨售出門，概不退還。</b><br><i>Goods sold are not returnable.</i></p>
+                    <p style="margin: 0;"><b>PUBLIC BANK: 3211687621</b><br><b>RONG MOTOR CAR SERVICE</b></p>
+                </div>
+                    
+                <div style="border: 1px solid #000; width: 230px;">
+                    <div style="display: flex; border-bottom: 1px solid #000; padding: 5px; font-size: 12px;">
+                        <div style="flex: 1;">TOTAL</div><div style="text-align: right;">RM @GrandTotal.ToString("N2")</div>
+                    </div>
+                    <div style="display: flex; border-bottom: 1px solid #000; padding: 5px; font-size: 12px;">
+                        <div style="flex: 1;">DEPOSIT</div><div style="text-align: right;">RM @deposit.ToString("N2")</div>
+                    </div>
+                    <div style="display: flex; padding: 5px; background: #f9f9f9; font-size: 12px;">
+                        <div style="flex: 1;">BALANCE</div><div style="text-align: right;">RM @((GrandTotal - deposit).ToString("N2"))</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px;">
+                <div style="text-align: center; width: 180px;">
+                    <div style="border-top: 1.5px solid #000; padding-top: 5px; font-weight: bold; font-size: 11px; text-transform: uppercase;">Issued By</div>
+                </div>
+                <div style="text-align: center; width: 180px;">
+                    <div style="border-top: 1.5px solid #000; padding-top: 5px; font-weight: bold; font-size: 11px; text-transform: uppercase;">Received By</div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Mr+Dafoe&display=swap');
+    .signature-ink { font-family: 'Mr Dafoe', cursive; font-size: 30px; color: #003399; transform: rotate(-3deg); display: inline-block; }
+    .workshop-stamp { position: absolute; border: 2px double rgba(0, 51, 153, 0.15); border-radius: 50%; color: rgba(0, 51, 153, 0.15); font-size: 8px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; left: 50%; top: -15px; transform: translateX(-50%) rotate(15deg); pointer-events: none; }
+    @@media print { .no-print { display: none !important; } .page { margin: 0; box-shadow: none; border: none; } }
+</style>
+
+@code {
+    // 1. Setup & Printing
+    private RongCar.AndroidPrintService _printService = new();
+    private bool showPreview = false;
+
+    // 2. Form Data
+    private string invoiceNo = "";
+    private string plateNo = "";
+    private string selectedCar = "";
+    private string specificModel = "";
+    private decimal deposit = 0;
+
+    public class InvoiceItem 
+    { 
+        public string Description { get; set; } = ""; 
+        public int Qty { get; set; } = 1; 
+        public decimal Price { get; set; } = 0; 
+    }
+
+    private List<InvoiceItem> Items = new() { new InvoiceItem() };
+
+    // 3. Logic Methods
+    private void AddItem()
+    {
+        if (Items.Count < 20)
+        {
+            Items.Add(new InvoiceItem());
+        }
+    }    private void TogglePreview() => showPreview = !showPreview;
+    private decimal GrandTotal => Items.Sum(x => x.Qty * x.Price);
+    
+    private string invoiceDate = DateTime.Now.ToString("dd MMMM yyyy", System.Globalization.CultureInfo.InvariantCulture);
+
+    private void ClearForm() 
+    { 
+        invoiceNo = ""; 
+        plateNo = ""; 
+        selectedCar = ""; 
+        specificModel = ""; 
+        deposit = 0; 
+        Items = new() { new InvoiceItem() }; 
+    }
+
+    private List<string> carBrands = new()
+    {
+        "HONDA", "TOYOTA", "NISSAN", "MITSUBISHI", "PROTON", "PERODUA", 
+        "HYUNDAI", "KIA", "BMW", "M.BENZ", "VW", "MAZDA", "MINI", 
+        "LEXUS", "FORD", "SUBARU", "SUZUKI", "VOLVO", "ISUZU", 
+        "Hi-COM", "CHERY", "JETOUR", "AUDI", "PEUGEOT", 
+        "LOTUS", "LAMBO", "FERRARI", "MCLAREN"
+    };
+ private void DirectAndroidPrint()
+{
+    // 1. DEDUCT STOCK
+    foreach (var invoiceItem in Items)
+    {
+        if (!string.IsNullOrWhiteSpace(invoiceItem.Description))
+        {
+            StorageService.ReduceStock(invoiceItem.Description, invoiceItem.Qty);
+        }
+    }
+    StateHasChanged(); // Refresh UI to show updated stock counts
+
+    // 2. GENERATE THE PRINT CONTENT
+    string printContent = $@"
+        <html>
+        <head>
+            <style>
+                body {{ margin: 0; padding: 0; background: white; }}
+                .page {{ 
+                    width: 210mm; min-height: 297mm; padding: 12mm; 
+                    margin: 0 auto; background: white; position: relative; 
+                    box-sizing: border-box; color: black; font-family: Arial, sans-serif; 
+                }}
+                table {{ width: 100%; border-collapse: collapse; }}
+                th, td {{ padding: 5px; }}
+            </style>
+        </head>
+        <body>
+            <div class='page'>
+                <div style='display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px;'>
+                    <div style='margin: 0; padding: 24px; position: relative; width: fit-content; min-width: 65%;
+                     background: 
+                        linear-gradient(to right, #000 3.5px, transparent 3.5px) 0 0,
+                        linear-gradient(to bottom, #000 3.5px, transparent 3.5px) 0 0,
+                        linear-gradient(to left, #000 3.5px, transparent 3.5px) 100% 100%,
+                        linear-gradient(to top, #000 3.5px, transparent 3.5px) 100% 100%;
+                     background-repeat: no-repeat;
+                     background-size: 150px 60px, 150px 60px, 450px 60px, 450px 60px; 
+                     line-height: 1.4;'>
+                        <h1 style='margin: 0; font-size: 18px; font-weight: 800; white-space: nowrap;'>RONG MOTOR CAR SERVICE</h1>
+                        <p style='margin: 3px 0; font-size: 13px; font-weight: bold;'>(002907945-T)</p>
+                        <p style='margin: 3px 0; font-size: 13px;'>35G, Jalan Seksyen 3/8, Taman Kajang Utama,</p>
+                        <p style='margin: 3px 0; font-size: 13px;'>43000 Kajang, Selangor Darul Ehsan.</p>
+                        <p style='margin: 3px 0; font-size: 13px;'>Tel : 012-836 7568</p>
+                    </div>
+                    <div style='text-align: right;'>
+                        <div style='font-size: 16px; display: block; margin-bottom: -5px;'>發貨單</div>
+                        <div style='text-decoration: underline; font-size: 16px; letter-spacing: 1px;'>Invoice</div>
+<div style='font-size: 16px; margin-top: 5px;'>
+    No <span style='color: #d93025;'>{invoiceNo}</span>
+</div>
+                    </div>
+                </div>
+
+                <div style='margin-bottom: 12px;'>
+                    <div style='display:flex; margin-bottom:2px; align-items: flex-end;'>
+                        <div style='width: 80px;font-size: 13px;'>Date</div>:<div style='font-size: 13px;flex:1; margin-left: 10px;'>{invoiceDate}</div>
+                    </div>
+                    <div style='display:flex; margin-bottom:2px; align-items: flex-end;'>
+                        <div style='width: 80px;font-size: 13px;'>Car</div>:<div style='font-size: 13px;flex:1; margin-left: 10px;'>{selectedCar} {specificModel}</div>
+                    </div>
+                    <div style='display:flex; margin-bottom:2px; align-items: flex-end;'>
+                        <div style='width: 80px;font-size: 13px;'>Plate No</div>:<div style='font-size: 13px;flex:1; margin-left: 10px;'>{plateNo}</div>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr style='border-top: 1px solid #000; border-bottom: 1px solid #000;'>
+                            <th style='width: 30px; text-align: center; font-size: 12px; font-weight: normal;'>No..</th>
+                            <th style='text-align: left; padding-left: 10px; font-size: 12px; font-weight: normal;'>PARTICULARS</th>
+                            <th style='width: 40px; text-align: center; font-size: 12px; font-weight: normal;'>Qty</th>
+                            <th style='width: 80px; text-align: right; font-size: 12px; font-weight: normal;'>U.Price</th>
+                            <th style='width: 100px; text-align: right; font-size: 12px; font-weight: normal;'>Total (RM)</th>
+                        </tr>
+                    </thead>
+                    <tbody>";
+    
+    int count = 1;
+    foreach (var item in Items)
+    {
+        printContent += $@"
+            <tr>
+                <td style='text-align: center; font-size: 10px;'>{count++}</td>
+                <td style='padding-left: 10px; font-size: 10px;'>{item.Description}</td>
+                <td style='text-align: center; font-size: 10px;'>{item.Qty}</td>
+                <td style='text-align: right; font-size: 10px;'>{item.Price:N2}</td>
+                <td style='text-align: right; font-size: 10px;'>{(item.Qty * item.Price):N2}</td>
+            </tr>";
+    }
+
+    printContent += $@"
+                    </tbody>
+                </table>
+
+                <div style='position: absolute; bottom: 12mm; left: 12mm; right: 12mm;'>
+                    <div style='display: flex; font-size: 12px; text-transform: uppercase;'>
+                        <span style='margin-right: 10px;'>RINGGIT MALAYSIA :</span>
+                        <div style='flex: 1;'>{NumberToWords((int)GrandTotal)} ONLY</div>
+                    </div>
+
+                    <div style='border-top: 2px solid #000; width: 100%; margin-bottom: 12px;'></div>
+                        
+                    <div style='display: flex; justify-content: space-between; align-items: flex-end;'>
+                        <div style='font-size: 11px;'>
+                            <p style='margin: 0 0 3px 0;'><b>貨售出門，概不退還。</b><br><i>Goods sold are not returnable.</i></p>
+                            <p style='margin: 0;'><b>PUBLIC BANK: 3211687621</b><br><b>RONG MOTOR CAR SERVICE</b></p>
+                        </div>
+                                    
+                        <div style='border: 1px solid #000; width: 230px;'>
+                            <div style='display: flex; border-bottom: 1px solid #000; padding: 5px; font-size: 12px;'>
+                                <div style='flex: 1;'>TOTAL</div><div style='text-align: right;'>RM {GrandTotal:N2}</div>
+                            </div>
+                            <div style='display: flex; border-bottom: 1px solid #000; padding: 5px; font-size: 12px;'>
+                                <div style='flex: 1;'>DEPOSIT</div><div style='text-align: right;'>RM {deposit:N2}</div>
+                            </div>
+                            <div style='display: flex; padding: 5px; background: #f9f9f9; font-size: 12px;'>
+                                <div style='flex: 1;'>BALANCE</div><div style='text-align: right;'>RM {(GrandTotal - deposit):N2}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style='display: flex; justify-content: space-between; align-items: flex-end; margin-top: 50px;'>
+                        <div style='text-align: center; width: 180px;'>
+                            <div style='height: 40px;'></div> 
+                            <div style='border-top: 1.5px solid #000; padding-top: 5px; font-weight: bold; font-size: 11px; text-transform: uppercase;'>Issued By</div>
+                        </div>
+                        <div style='text-align: center; width: 180px;'>
+                            <div style='height: 40px;'></div> 
+                            <div style='border-top: 1.5px solid #000; padding-top: 5px; font-weight: bold; font-size: 11px; text-transform: uppercase;'>Received By</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>";
+
+    #if ANDROID
+        _printService.PrintHtml(printContent);
+    #endif
+}
+    private string NumberToWords(int number) 
+    {
+        if (number == 0) return "ZERO";
+        var unitsMap = new[] { "ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN" };
+        var tensMap = new[] { "ZERO", "TEN", "TWENTY", "THIRTY", "FORTY", "FIFTY", "SIXTY", "SEVENTY", "EIGHTY", "NINETY" };
+        if (number < 20) return unitsMap[number];
+        if (number < 100) return tensMap[number / 10] + ((number % 10 > 0) ? "-" + unitsMap[number % 10] : "");
+        if (number < 1000) return unitsMap[number / 100] + " HUNDRED" + ((number % 100 > 0) ? " AND " + NumberToWords(number % 100) : "");
+        if (number < 1000000) return NumberToWords(number / 1000) + " THOUSAND" + ((number % 1000 > 0) ? " " + NumberToWords(number % 1000) : "");
+        return number.ToString();
+    }
+}

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="RongCar/RongCar.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+</Solution>

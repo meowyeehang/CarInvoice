@@ -1,0 +1,116 @@
+/* Force the app to show the A4 page correctly */
+.page-container {
+    background-color: #525659; /* Dark grey background like a PDF viewer */
+    padding: 20px 0;
+    min-height: 100vh;
+}
+
+.page {
+    width: 210mm;
+    height: 297mm;
+    padding: 15mm;
+    margin: 0 auto;
+    background: white;
+    position: relative; /* CRITICAL: This keeps the footer inside the box */
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Header Sections */
+.header-flex {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.company-info h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 900;
+    color: black;
+}
+
+.company-info p {
+    margin: 2px 0;
+    font-size: 13px;
+    font-weight: bold;
+    color: black;
+}
+
+/* Table Section */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th {
+    border-top: 2.5px solid #000;
+    border-bottom: 2.5px solid #000;
+    padding: 10px 5px;
+    font-size: 13px;
+}
+
+td {
+    padding: 10px 5px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: black;
+}
+
+/* Sticky Footer (Fixed at the bottom of A4) */
+.footer-area {
+    position: absolute;
+    bottom: 15mm;
+    left: 15mm;
+    right: 15mm;
+}
+
+.totals-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.totals-box {
+    width: 240px;
+    border: 2px solid #000;
+}
+
+.total-row {
+    display: flex;
+    border-bottom: 1px solid #000;
+}
+
+.total-label {
+    flex: 1;
+    padding: 8px;
+    border-right: 2px solid #000;
+    font-weight: 900;
+    background: #f9f9f9;
+}
+
+.total-val {
+    width: 90px;
+    padding: 8px;
+    text-align: right;
+    font-weight: 900;
+}
+
+/* Hide UI during Print */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .page-container {
+        background: none;
+        padding: 0;
+    }
+
+    .page {
+        margin: 0;
+        box-shadow: none;
+    }
+}

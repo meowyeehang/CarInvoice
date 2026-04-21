@@ -47,6 +47,14 @@
                     <label style="font-size: 12px; color: #70757a; font-weight: 600;">CAR MODEL / REMARKS</label>
                     <input @bind="specificModel" placeholder="e.g. CIVIC FL1" style="width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;" />
                 </div>
+                 <div>
+                    <label style="font-size: 12px; color: #70757a; font-weight: 600;">Mileage</label>
+                    <input type="number" @bind="mileage" style="width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;" />
+                </div>
+                 <div style="grid-column: span 2;">
+                    <label style="font-size: 12px; color: #70757a; font-weight: 600;">Company</label>
+                    <input @bind="company" style="width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;" />
+                </div>
             </div>
         </div>
 
@@ -138,15 +146,28 @@ else
             </div>
 
             @* Vehicle & Date Info *@
-            <div style="margin-bottom: 8px; font-size: 12px; flex-shrink: 0;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Date: @invoiceDate</span>
-                    <span style="font-size: 14px;">No. <b style="color:red;">@invoiceNo</b></span>
-                </div>
-                <div>Car: @selectedCar @specificModel</div>
-                <div>Plate No: <span style="text-transform: uppercase;">@plateNo</span></div>
+          <div style="margin-bottom: 8px; font-size: 12px; flex-shrink: 0;">
+            <div style="display: flex; justify-content: space-between;">
+                <span>Company: @company</span>
+                <span style="font-size: 14px;">No. <b style="color:red;">@invoiceNo</b></span>
             </div>
+      @*    <div>Car: @selectedCar @specificModel</div>
+                    <div>Plate No: <span style="text-transform: uppercase;">@plateNo</span></div>
+                    <div>Mileage: <span style="text-transform: uppercase;">@mileage</span></div>
+                    <div>Company: <span style="text-transform: uppercase;">@company</span></div> *@
+            <div>Plate No: <span style="text-transform: uppercase;">@plateNo</span></div>
 
+            <div style="width: 180px;">Car: @selectedCar @specificModel</div>
+
+            <div style="display: flex; justify-content: space-between;">
+                <div style="width: 180px;">Mileage:@mileage km</div>
+                <span>Date: @invoiceDate</span>
+            </div>
+        </div>
+
+             @*    <div>Car: @selectedCar @specificModel</div>
+                <div>Plate No: <span style="text-transform: uppercase;">@plateNo</span></div>
+ *@
             @* Table Area - Same row heights as print *@
             <div style="flex-grow: 1; overflow: hidden;">
                 <table style="width: 100%; border-collapse: collapse;">
@@ -162,7 +183,7 @@ else
                     <tbody>
                         @{ int i = 1; }
                         @foreach (var item in Items) {
-                            <tr style="height: 22px; font-size: 11px;">
+                            <tr style="height: 21px; font-size: 11px;">
                                 <td align="center">@(i++)</td>
                                 <td style="padding-left: 10px;">@item.Description</td>
                                 <td align="center">@item.Qty</td>
@@ -172,7 +193,7 @@ else
                         }
                         @* Filling exactly 20 rows *@
                         @for (int emptyIdx = Items.Count; emptyIdx < 26; emptyIdx++) {
-                            <tr style="height: 24px; font-size: 11px;">
+                            <tr style="height: 21px; font-size: 11px;">
                                 <td align="center"></td>
                                 <td colspan="4"></td>
                             </tr>
@@ -246,6 +267,8 @@ else
     private string selectedCar = "";
     private string specificModel = "";
     private decimal deposit = 0;
+    private string mileage = "";
+    private string company = "";
 
     public class InvoiceItem 
     { 
@@ -357,14 +380,21 @@ private void DirectAndroidPrint()
                 <div style='border-bottom: 1px solid #000; margin-top: 10px;'></div>
             </div>
 
-            <div style='margin-bottom: 8px; font-size: 12px; flex-shrink: 0;'>
-                <div style='display: flex; justify-content: space-between;'>
-                    <span>Date: {invoiceDate}</span>
-                    <span style='font-size: 14px;'>No. <b style='color:red;'>{invoiceNo}</b></span>
-                </div>
-                <div>Car: {selectedCar} {specificModel}</div>
-                <div>Plate No: <span style='text-transform: uppercase;'>{plateNo}</span></div>
-            </div>
+           <div style='margin-bottom: 8px; font-size: 12px; flex-shrink: 0; line-height: 1.6; font-family: sans-serif;'>
+    <div style='display: flex; justify-content: space-between;'>
+        <span>Company: {company}</span>
+        <span style='font-size: 14px;'>No. <b style='color:red;'>{invoiceNo}</b></span>
+    </div>
+
+    <div style='text-transform: uppercase;'>Plate No: {plateNo}</div>
+
+    <div>Car: {selectedCar} {specificModel}</div>
+
+    <div style='display: flex; justify-content: space-between;'>
+        <div style='width: 180px;'>Mileage: {mileage} km</div>
+        <span>Date: {invoiceDate}</span>
+    </div>
+</div>
 
             <div style='flex-grow: 1; overflow: hidden;'>
                 <table>

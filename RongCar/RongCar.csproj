@@ -58,7 +58,7 @@
         Include="Resources\Splash\s2k_splash.png"
         Color="#fdf8e1"
         BaseSize="128,128"
-        Resize="true" />
+        Resize="false" />
 		<!-- Images -->
         <MauiImage Include="Resources\Images\*" />
         <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
